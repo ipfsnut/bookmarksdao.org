@@ -32,7 +32,7 @@ const Header = () => {
   return (
     <header className={`header ${isScrolled ? 'scrolled' : ''}`} id="header">
       <div className="container nav-container">
-        <a href="#" className="logo">
+        <a href="/" className="logo">
           <i className="fas fa-bookmark"></i> BookmarksDAO
         </a>
         <button className="mobile-menu-btn" onClick={toggleMobileMenu}>
