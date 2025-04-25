@@ -1,0 +1,993 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>BookmarksDAO - Tokenized Book Discovery Protocol</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;700;900&family=Source+Sans+Pro:wght@300;400;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        :root {
+            --primary: #2A3D66;
+            --secondary: #6883BA;
+            --accent: #F26419;
+            --light: #F2F2F2;
+            --dark: #0D0D0D;
+            --paper: #fffaf0;
+        }
+        
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Source Sans Pro', sans-serif;
+            line-height: 1.6;
+            color: var(--dark);
+            background-color: var(--light);
+            overflow-x: hidden;
+        }
+        
+        header {
+            background-color: var(--primary);
+            color: white;
+            padding: 1rem 0;
+            position: fixed;
+            width: 100%;
+            top: 0;
+            z-index: 1000;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.2);
+            transition: all 0.3s ease;
+        }
+        
+        header.scrolled {
+            padding: 0.5rem 0;
+            background-color: rgba(42, 61, 102, 0.95);
+        }
+        
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 2rem;
+        }
+        
+        .nav-container {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        
+        .logo {
+            font-family: 'Playfair Display', serif;
+            font-size: 1.5rem;
+            font-weight: 700;
+            color: white;
+            text-decoration: none;
+            display: flex;
+            align-items: center;
+        }
+        
+        .logo i {
+            margin-right: 0.5rem;
+            font-size: 1.8rem;
+        }
+        
+        nav ul {
+            display: flex;
+            list-style: none;
+        }
+        
+        nav ul li {
+            margin-left: 2rem;
+        }
+        
+        nav ul li a {
+            color: white;
+            text-decoration: none;
+            font-weight: 600;
+            transition: all 0.3s ease;
+            position: relative;
+        }
+        
+        nav ul li a:after {
+            content: '';
+            position: absolute;
+            width: 0;
+            height: 2px;
+            background: var(--accent);
+            bottom: -5px;
+            left: 0;
+            transition: width 0.3s ease;
+        }
+        
+        nav ul li a:hover:after {
+            width: 100%;
+        }
+        
+        .mobile-menu-btn {
+            display: none;
+            background: none;
+            border: none;
+            color: white;
+            font-size: 1.5rem;
+            cursor: pointer;
+        }
+        
+        h1, h2, h3, h4 {
+            font-family: 'Playfair Display', serif;
+            margin-bottom: 1rem;
+            line-height: 1.3;
+        }
+        
+        h1 {
+            font-size: 3.5rem;
+            margin-bottom: 0.5rem;
+            font-weight: 900;
+        }
+        
+        h2 {
+            font-size: 2.5rem;
+            color: var(--primary);
+            margin-top: 2rem;
+        }
+        
+        p {
+            margin-bottom: 1.5rem;
+            font-size: 1.1rem;
+        }
+        
+        .subtitle {
+            font-size: 1.5rem;
+            font-weight: 300;
+            margin-bottom: 2rem;
+        }
+        
+        .hero {
+            padding: 8rem 0 6rem;
+            background: linear-gradient(135deg, var(--primary) 0%, #1a2a4f 100%);
+            color: white;
+            text-align: center;
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .hero::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-image: url('https://images.unsplash.com/photo-1507842217343-583bb7270b66?ixlib=rb-1.2.1&auto=format&fit=crop&w=1350&q=80');
+            background-size: cover;
+            background-position: center;
+            opacity: 0.15;
+            z-index: 0;
+        }
+        
+        .hero-content {
+            position: relative;
+            z-index: 1;
+        }
+        
+        .hero h1 {
+            font-size: 4rem;
+            margin-bottom: 1rem;
+            text-shadow: 0 2px 10px rgba(0,0,0,0.3);
+        }
+        
+        .hero p {
+            font-size: 1.5rem;
+            max-width: 800px;
+            margin: 0 auto 2rem;
+            text-shadow: 0 1px 5px rgba(0,0,0,0.2);
+        }
+        
+        .button {
+            display: inline-block;
+            background-color: var(--accent);
+            color: white;
+            padding: 0.75rem 1.5rem;
+            border-radius: 30px;
+            text-decoration: none;
+            font-weight: 600;
+            transition: all 0.3s ease;
+            margin: 0.5rem;
+            box-shadow: 0 4px 10px rgba(242, 100, 25, 0.3);
+            border: none;
+            cursor: pointer;
+        }
+        
+        .button:hover {
+            background-color: #e05000;
+            transform: translateY(-2px);
+            box-shadow: 0 6px 15px rgba(242, 100, 25, 0.4);
+        }
+        
+        .button.secondary {
+            background-color: transparent;
+            border: 2px solid white;
+            box-shadow: none;
+        }
+        
+        .button.secondary:hover {
+            background-color: rgba(255, 255, 255, 0.1);
+            box-shadow: 0 4px 10px rgba(255, 255, 255, 0.2);
+        }
+        
+        .features {
+            padding: 6rem 0;
+            background-color: white;
+        }
+        
+        .section-header {
+            text-align: center;
+            margin-bottom: 4rem;
+        }
+        
+        .section-header h2 {
+            display: inline-block;
+            position: relative;
+            margin-bottom: 1rem;
+        }
+        
+        .section-header h2:after {
+            content: '';
+            position: absolute;
+            width: 60%;
+            height: 3px;
+            background: var(--accent);
+            bottom: -10px;
+            left: 20%;
+        }
+        
+        .features-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 2rem;
+            margin-top: 3rem;
+        }
+        
+        .feature-card {
+            border-radius: 10px;
+            padding: 2rem;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+            transition: all 0.3s ease;
+            background-color: white;
+            text-align: center;
+        }
+        
+        .feature-card:hover {
+            transform: translateY(-10px);
+            box-shadow: 0 15px 30px rgba(0,0,0,0.15);
+        }
+        
+        .feature-card h3 {
+            color: var(--primary);
+            font-size: 1.5rem;
+            margin-bottom: 1rem;
+        }
+        
+        .icon {
+            font-size: 3rem;
+            margin-bottom: 1rem;
+            color: var(--accent);
+            display: inline-block;
+            background-color: rgba(242, 100, 25, 0.1);
+            width: 80px;
+            height: 80px;
+            line-height: 80px;
+            border-radius: 50%;
+        }
+        
+        .whitepaper {
+            padding: 6rem 0;
+            background-color: var(--paper);
+            position: relative;
+        }
+        
+        .whitepaper-container {
+            background-color: white;
+            border-radius: 10px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+            padding: 3rem;
+            max-width: 900px;
+            margin: 0 auto;
+            position: relative;
+            display: flex;
+            flex-direction: column;
+        }
+        
+        .whitepaper-container::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-image: url('data:image/svg+xml;utf8,<svg width="100" height="100" viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg"><path d="M96,0H4C1.8,0,0,1.8,0,4v92c0,2.2,1.8,4,4,4h92c2.2,0,4-1.8,4-4V4C100,1.8,98.2,0,96,0z" fill="white"/></svg>');
+            background-size: 20px 20px;
+            background-repeat: repeat;
+            opacity: 0.05;
+            z-index: 0;
+            border-radius: 10px;
+        }
+        
+        .whitepaper-content {
+            position: relative;
+            z-index: 1;
+        }
+        
+        .whitepaper-nav {
+            position: sticky;
+            top: 100px;
+            background-color: var(--light);
+            border-radius: 10px;
+            padding: 1.5rem;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.05);
+            display: none; /* Initially hidden, will be populated by JS */
+            margin-bottom: 2rem;
+            max-height: 300px;
+            overflow-y: auto;
+        }
+        
+        .whitepaper-nav h4 {
+            margin-bottom: 1rem;
+            font-size: 1.2rem;
+        }
+        
+        .whitepaper-nav ul {
+            list-style-type: none;
+        }
+        
+        .whitepaper-nav ul li {
+            margin-bottom: 0.5rem;
+        }
+        
+        .whitepaper-nav ul li a {
+            color: var(--primary);
+            text-decoration: none;
+            font-size: 0.9rem;
+            transition: all 0.3s ease;
+        }
+        
+        .whitepaper-nav ul li a:hover {
+            color: var(--accent);
+            padding-left: 5px;
+        }
+        
+        #whitepaper-content {
+            line-height: 1.7;
+        }
+        
+        #whitepaper-content h1 {
+            font-size: 2.5rem;
+            margin-bottom: 1.5rem;
+            color: var(--primary);
+        }
+        
+        #whitepaper-content h2 {
+            font-size: 2rem;
+            margin-top: 2.5rem;
+            margin-bottom: 1.5rem;
+            color: var(--primary);
+            border-bottom: 2px solid var(--light);
+            padding-bottom: 0.5rem;
+        }
+        
+        #whitepaper-content h3 {
+            font-size: 1.5rem;
+            margin-top: 2rem;
+            margin-bottom: 1rem;
+            color: var(--primary);
+        }
+        
+        #whitepaper-content p {
+            margin-bottom: 1.5rem;
+        }
+        
+        #whitepaper-content ul, #whitepaper-content ol {
+            margin-left: 2rem;
+            margin-bottom: 1.5rem;
+        }
+        
+        #whitepaper-content li {
+            margin-bottom: 0.5rem;
+        }
+        
+        #whitepaper-content strong {
+            font-weight: 600;
+            color: var(--primary);
+        }
+        
+        .whitepaper-loading {
+            text-align: center;
+            padding: 3rem;
+            font-style: italic;
+            color: #888;
+        }
+        
+        .ipfs-link {
+            display: inline-flex;
+            align-items: center;
+            color: var(--primary);
+            text-decoration: none;
+            font-size: 0.9rem;
+            margin-top: 1rem;
+            background-color: rgba(42, 61, 102, 0.1);
+            padding: 0.5rem 1rem;
+            border-radius: 20px;
+            transition: all 0.3s ease;
+        }
+        
+        .ipfs-link i {
+            margin-right: 0.5rem;
+        }
+        
+        .ipfs-link:hover {
+            background-color: rgba(42, 61, 102, 0.2);
+        }
+        
+        .cta {
+            padding: 6rem 0;
+            background: linear-gradient(135deg, var(--primary) 0%, #1a2a4f 100%);
+            color: white;
+            text-align: center;
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .cta::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-image: url('https://images.unsplash.com/photo-1481627834876-b7833e8f5570?ixlib=rb-1.2.1&auto=format&fit=crop&w=1350&q=80');
+            background-size: cover;
+            background-position: center;
+            opacity: 0.1;
+            z-index: 0;
+        }
+        
+        .cta-content {
+            position: relative;
+            z-index: 1;
+        }
+        
+        .cta h2 {
+            color: white;
+            margin-bottom: 2rem;
+            text-shadow: 0 2px 10px rgba(0,0,0,0.3);
+        }
+        
+        /* Signup form styles */
+        .signup-form {
+            max-width: 500px;
+            margin: 2rem auto;
+            background-color: rgba(255, 255, 255, 0.1);
+            padding: 2rem;
+            border-radius: 10px;
+            backdrop-filter: blur(5px);
+        }
+        
+        .form-group {
+            margin-bottom: 1.5rem;
+            text-align: left;
+        }
+        
+        .form-group label {
+            display: block;
+            margin-bottom: 0.5rem;
+            font-weight: 600;
+        }
+        
+        .form-group input {
+            width: 100%;
+            padding: 0.75rem;
+            border-radius: 5px;
+            border: 1px solid rgba(255, 255, 255, 0.3);
+            background-color: rgba(255, 255, 255, 0.2);
+            color: white;
+            font-size: 1rem;
+        }
+        
+        .form-group input::placeholder {
+            color: rgba(255, 255, 255, 0.7);
+        }
+        
+        .wallet-info {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            background-color: rgba(255, 255, 255, 0.1);
+            padding: 0.75rem 1rem;
+            border-radius: 5px;
+            margin-bottom: 1rem;
+        }
+        
+        .wallet-address {
+            font-family: monospace;
+            font-size: 0.9rem;
+            word-break: break-all;
+        }
+        
+        /* Responsive styles */
+        @media (max-width: 992px) {
+            .whitepaper-nav {
+                position: relative;
+                top: 0;
+            }
+        }
+        
+        @media (max-width: 768px) {
+            .hero h1 {
+                font-size: 3rem;
+            }
+            
+            .hero p {
+                font-size: 1.2rem;
+            }
+            
+            nav ul {
+                display: none;
+                position: absolute;
+                top: 100%;
+                left: 0;
+                width: 100%;
+                background-color: var(--primary);
+                flex-direction: column;
+                padding: 1rem 0;
+                box-shadow: 0 5px 10px rgba(0,0,0,0.2);
+            }
+            
+            nav ul.active {
+                display: flex;
+            }
+            
+            nav ul li {
+                margin: 0;
+                text-align: center;
+                padding: 0.8rem 0;
+            }
+            
+            .mobile-menu-btn {
+                display: block;
+            }
+            
+            .whitepaper-container {
+                padding: 2rem;
+            }
+        }
+        
+        @media (max-width: 576px) {
+            .hero h1 {
+                font-size: 2.5rem;
+            }
+            
+            .section-header h2 {
+                font-size: 2rem;
+            }
+            
+            .feature-card {
+                padding: 1.5rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <header id="header">
+        <div class="container nav-container">
+            <a href="#" class="logo"><i class="fas fa-bookmark"></i> BookmarksDAO</a>
+            <button class="mobile-menu-btn" id="mobile-menu-btn">
+                <i class="fas fa-bars"></i>
+            </button>
+            <nav>
+                <ul id="nav-menu">
+                    <li><a href="#features">Features</a></li>
+                    <li><a href="#whitepaper">Whitepaper</a></li>
+                    <li><a href="#cta">Join Us</a></li>
+                </ul>
+            </nav>
+        </div>
+    </header>
+
+    <div class="hero">
+        <div class="container hero-content">
+            <h1>BookmarksDAO</h1>
+            <p class="subtitle">A Tokenized Book Discovery Protocol</p>
+            <p>Reimagining book discovery through token incentives where people put their money where their mouth is.</p>
+            <a href="#whitepaper" class="button">Read Whitepaper</a>
+            <a href="#cta" class="button secondary">Join Waitlist</a>
+        </div>
+    </div>
+    
+    <section class="features" id="features">
+        <div class="container">
+            <div class="section-header">
+                <h2>Why BookmarksDAO?</h2>
+                <p>BookmarksDAO is reimagining how we discover, curate, and reward written content in the web3 era.</p>
+            </div>
+            
+            <div class="features-grid">
+                <div class="feature-card">
+                    <div class="icon"><i class="fas fa-book"></i></div>
+                    <h3>Community Curation</h3>
+                    <p>Content rises based on genuine community appreciation, not algorithms or paid promotion.</p>
+                </div>
+                
+                <div class="feature-card">
+                    <div class="icon"><i class="fas fa-coins"></i></div>
+                    <h3>Creator Rewards</h3>
+                    <p>Authors receive direct rewards when their content is valued by the community.</p>
+                </div>
+                
+                <div class="feature-card">
+                    <div class="icon"><i class="fas fa-search"></i></div>
+                    <h3>Discovery Mechanism</h3>
+                    <p>Find great books through a transparent, community-driven curation system.</p>
+                </div>
+                
+                <div class="feature-card">
+                    <div class="icon"><i class="fas fa-sync-alt"></i></div>
+                    <h3>Weekly Cycles</h3>
+                    <p>Dynamic leaderboards refresh weekly, ensuring content discovery stays fresh.</p>
+                </div>
+                
+                <div class="feature-card">
+                    <div class="icon"><i class="fas fa-trophy"></i></div>
+                    <h3>Curator Recognition</h3>
+                    <p>Early discoverers of great content earn recognition and potential future rewards.</p>
+                </div>
+                
+                <div class="feature-card">
+                    <div class="icon"><i class="fas fa-link"></i></div>
+                    <h3>On-Chain Transparency</h3>
+                    <p>All delegations and rewards are verifiable on the blockchain.</p>
+                </div>
+            </div>
+        </div>
+    </section>
+    
+    <section class="whitepaper" id="whitepaper">
+        <div class="container">
+            <div class="section-header">
+                <h2>Whitepaper</h2>
+                <p>Explore our detailed vision for the BookmarksDAO protocol.</p>
+                <a href="ipfs://bafkreidktpi2aadolykdam2r2doq6z42nwrdqfheaznrjbmpicqpezucwe" class="ipfs-link">
+                    <i class="fas fa-network-wired"></i> Direct IPFS link
+                </a>
+            </div>
+            
+            <div class="whitepaper-container">
+                <div class
+                <div class="whitepaper-nav" id="whitepaper-nav">
+                    <h4>Table of Contents</h4>
+                    <ul id="toc-list">
+                        <!-- Will be populated by JavaScript -->
+                    </ul>
+                </div>
+                
+                <div class="whitepaper-content">
+                    <div class="whitepaper-loading" id="whitepaper-loading">
+                        Loading whitepaper from IPFS...
+                    </div>
+                    <div id="whitepaper-content"></div>
+                </div>
+            </div>
+        </div>
+    </section>
+    
+    <section class="cta" id="cta">
+        <div class="container cta-content">
+            <h2>Join the BookmarksDAO Community</h2>
+            <p>Be part of the future of decentralized book curation and discovery.</p>
+            
+            <div class="signup-form">
+                <div class="form-group">
+                    <label for="email">Email Address</label>
+                    <input type="email" id="email" placeholder="your@email.com" required>
+                </div>
+                
+                <div class="form-group">
+                    <label>Wallet Connection</label>
+                    <div id="wallet-display">
+                        <button id="connect-wallet" class="button secondary">
+                            <i class="fas fa-wallet"></i> Connect Wallet
+                        </button>
+                    </div>
+                </div>
+                
+                <button id="submit-signup" class="button">Join Waitlist</button>
+            </div>
+        </div>
+    </section>
+
+    <script src="https://cdn.ethers.io/lib/ethers-5.2.umd.min.js" type="application/javascript"></script>
+    <script>
+        // Mobile menu toggle
+        document.getElementById('mobile-menu-btn').addEventListener('click', function() {
+            document.getElementById('nav-menu').classList.toggle('active');
+        });
+        
+        // Header scroll effect
+        window.addEventListener('scroll', function() {
+            if (window.scrollY > 50) {
+                document.getElementById('header').classList.add('scrolled');
+            } else {
+                document.getElementById('header').classList.remove('scrolled');
+            }
+        });
+        
+        // Smooth scrolling for anchor links
+        document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+            anchor.addEventListener('click', function(e) {
+                e.preventDefault();
+                
+                const targetId = this.getAttribute('href');
+                if (targetId === '#') return;
+                
+                const targetElement = document.querySelector(targetId);
+                if (targetElement) {
+                    window.scrollTo({
+                        top: targetElement.offsetTop - 80,
+                        behavior: 'smooth'
+                    });
+                    
+                    // Close mobile menu if open
+                    document.getElementById('nav-menu').classList.remove('active');
+                }
+            });
+        });
+        
+        // Load and render whitepaper from IPFS
+        async function loadWhitepaper() {
+            const whitepaperCID = "bafkreidktpi2aadolykdam2r2doq6z42nwrdqfheaznrjbmpicqpezucwe";
+            const ipfsGateways = [
+                "https://ipfs.io/ipfs/",
+                "https://gateway.pinata.cloud/ipfs/",
+                "https://cloudflare-ipfs.com/ipfs/",
+                "https://dweb.link/ipfs/"
+            ];
+            
+            try {
+                document.getElementById('whitepaper-loading').innerHTML = 
+                    'Loading whitepaper from IPFS...';
+                
+                // Try to load from multiple gateways
+                const text = await tryLoadFromGateways(whitepaperCID);
+                renderWhitepaper(text);
+                
+                // Add download button
+                addDownloadButton(whitepaperCID);
+            } catch (error) {
+                console.error('Error loading whitepaper from IPFS:', error);
+                document.getElementById('whitepaper-loading').innerHTML = 
+                    `Error loading whitepaper from IPFS. Please try again later.<br>
+                    <small>You can also access it directly at 
+                    <a href="${ipfsGateways[0]}${whitepaperCID}" target="_blank">IPFS Gateway</a></small>`;
+            }
+        }
+        
+        async function tryLoadFromGateways(cid) {
+            const ipfsGateways = [
+                "https://ipfs.io/ipfs/",
+                "https://gateway.pinata.cloud/ipfs/",
+                "https://cloudflare-ipfs.com/ipfs/",
+                "https://dweb.link/ipfs/"
+            ];
+            
+            for (const gateway of ipfsGateways) {
+                try {
+                    console.log(`Trying to load from ${gateway}${cid}`);
+                    const response = await fetch(`${gateway}${cid}`);
+                    if (response.ok) {
+                        return await response.text();
+                    }
+                } catch (error) {
+                    console.warn(`Failed to load from ${gateway}`, error);
+                }
+            }
+            throw new Error("Failed to load from all IPFS gateways");
+        }
+        
+        function addDownloadButton(cid) {
+            const downloadBtn = document.createElement('a');
+            downloadBtn.href = `https://ipfs.io/ipfs/${cid}`;
+            downloadBtn.download = "BookmarksDAO-Whitepaper.txt";
+            downloadBtn.className = "button secondary";
+            downloadBtn.innerHTML = '<i class="fas fa-download"></i> Download Whitepaper';
+            downloadBtn.style.marginTop = "1rem";
+            downloadBtn.style.display = "inline-block";
+            
+            document.querySelector('.whitepaper-content').prepend(downloadBtn);
+        }
+        
+        function renderWhitepaper(markdownText) {
+            // Hide loading message
+            document.getElementById('whitepaper-loading').style.display = 'none';
+            
+            // Simple markdown to HTML conversion
+            let html = markdownText
+                // Convert headers
+                .replace(/^# (.*$)/gm, '<h1 id="$1">$1</h1>')
+                .replace(/^## (.*$)/gm, '<h2 id="$1">$1</h2>')
+                .replace(/^### (.*$)/gm, '<h3 id="$1">$1</h3>')
+                
+                // Convert bold text
+                .replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>')
+                
+                // Convert lists
+                .replace(/^\d+\. (.*$)/gm, '<li>$1</li>')
+                .replace(/^- (.*$)/gm, '<li>$1</li>')
+                
+                // Convert paragraphs (any line that doesn't start with a special character)
+                .replace(/^(?!<h|<li|<ul|<ol|<p|<\/)(.*$)/gm, '<p>$1</p>')
+                
+                // Wrap lists
+                .replace(/(<li>.*<\/li>\n)+/g, function(match) {
+                    if (match.includes('<li>1.')) {
+                        return '<ol>' + match + '</ol>';
+                    } else {
+                        return '<ul>' + match + '</ul>';
+                    }
+                });
+            
+            // Set the HTML content
+            document.getElementById('whitepaper-content').innerHTML = html;
+            
+            // Generate table of contents
+            generateTableOfContents();
+            
+            // Show the navigation
+            document.getElementById('whitepaper-nav').style.display = 'block';
+        }
+        
+        function generateTableOfContents() {
+            const headers = document.querySelectorAll('#whitepaper-content h1, #whitepaper-content h2');
+            const tocList = document.getElementById('toc-list');
+            
+            headers.forEach(header => {
+                const id = header.id || header.textContent.replace(/[^a-z0-9]/gi, '-').toLowerCase();
+                header.id = id;
+                
+                const listItem = document.createElement('li');
+                const link = document.createElement('a');
+                link.href = `#${id}`;
+                link.textContent = header.textContent;
+                
+                // Add indentation for h2 elements
+                if (header.tagName === 'H2') {
+                    listItem.style.paddingLeft = '1rem';
+                }
+                
+                listItem.appendChild(link);
+                tocList.appendChild(listItem);
+                
+                // Add click event for smooth scrolling
+                link.addEventListener('click', function(e) {
+                    e.preventDefault();
+                    
+                    const targetElement = document.getElementById(id);
+                    if (targetElement) {
+                        window.scrollTo({
+                            top: targetElement.offsetTop - 100,
+                            behavior: 'smooth'
+                        });
+                    }
+                });
+            });
+        }
+        
+        // Wallet connection functionality
+        let userWalletAddress = null;
+        
+        async function connectWallet() {
+            if (window.ethereum) {
+                try {
+                    const accounts = await window.ethereum.request({ method: 'eth_requestAccounts' });
+                    handleAccountsChanged(accounts);
+                    
+                    // Listen for account changes
+                    window.ethereum.on('accountsChanged', handleAccountsChanged);
+                } catch (error) {
+                    console.error("Error connecting to wallet:", error);
+                    alert("Error connecting to wallet. Please try again.");
+                }
+            } else {
+                alert("No Ethereum wallet detected. Please install MetaMask or another web3 wallet.");
+            }
+        }
+        
+        function handleAccountsChanged(accounts) {
+            if (accounts.length === 0) {
+                // User disconnected their wallet
+                userWalletAddress = null;
+                updateWalletDisplay();
+            } else {
+                // User connected their wallet
+                userWalletAddress = accounts[0];
+                updateWalletDisplay();
+            }
+        }
+        
+        function updateWalletDisplay() {
+            const walletDisplay = document.getElementById('wallet-display');
+            
+            if (userWalletAddress) {
+                // User has connected wallet
+                walletDisplay.innerHTML = `
+                    <div class="wallet-info">
+                        <span class="wallet-address">${formatWalletAddress(userWalletAddress)}</span>
+                        <button id="disconnect-wallet" class="button secondary">Disconnect</button>
+                    </div>
+                `;
+                
+                // Add disconnect event listener
+                document.getElementById('disconnect-wallet').addEventListener('click', disconnectWallet);
+            } else {
+                // User hasn't connected wallet
+                walletDisplay.innerHTML = `
+                    <button id="connect-wallet" class="button secondary">
+                        <i class="fas fa-wallet"></i> Connect Wallet
+                    </button>
+                `;
+                
+                // Add connect event listener
+                document.getElementById('connect-wallet').addEventListener('click', connectWallet);
+            }
+        }
+        
+        function formatWalletAddress(address) {
+            return address.substring(0, 6) + '...' + address.substring(address.length - 4);
+        }
+        
+        function disconnectWallet() {
+            userWalletAddress = null;
+            updateWalletDisplay();
+        }
+        
+        // Form submission
+        async function handleSignup() {
+            const email = document.getElementById('email').value;
+            
+            if (!email) {
+                alert("Please enter your email address.");
+                return;
+            }
+            
+            try {
+                // Here you would typically send this data to your backend
+                // For now, we'll just log it to the console
+                console.log("Signup data:", {
+                    email: email,
+                    walletAddress: userWalletAddress
+                });
+                
+                alert("Thanks for joining the waitlist! We'll be in touch soon.");
+                document.getElementById('email').value = '';
+            } catch (error) {
+                console.error("Error submitting form:", error);
+                alert("There was an error submitting your information. Please try again.");
+            }
+        }
+        
+        // Initialize
+        document.addEventListener('DOMContentLoaded', function() {
+            // Load whitepaper
+            loadWhitepaper();
+            
+            // Setup wallet display
+            updateWalletDisplay();
+            
+            // Setup form submission
+            document.getElementById('submit-signup').addEventListener('click', handleSignup);
+        });
+    </script>
+</body>
+</html>

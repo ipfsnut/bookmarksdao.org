@@ -1,0 +1,10 @@
+@import '~@fortawesome/fontawesome-free/css/all.min.css';
+@import './styles/variables.css';
+@import './styles/global.css';
+
+body {
+  margin: 0;
+  font-family: 'Source Sans Pro', sans-serif;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}

@@ -1,0 +1,20 @@
+{
+	"geolocation": {
+		"data": {
+			"city": "Lubbock",
+			"country": {
+				"code": "US",
+				"name": "United States"
+			},
+			"subdivision": {
+				"code": "TX",
+				"name": "Texas"
+			},
+			"timezone": "America/Chicago",
+			"latitude": 33.5683,
+			"longitude": -101.9388,
+			"postalCode": "79407"
+		},
+		"timestamp": 1745617994680
+	}
+}
