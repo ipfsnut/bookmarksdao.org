@@ -39,7 +39,7 @@ const Features = () => {
     {
       icon: 'fa-link',
       title: 'On-Chain Transparency',
-      description: 'All delegations and rewards are verifiable on the blockchain.'
+      description: 'All lock-ins visible onchain from day 1, creating a culture of transparency from day 1.'
     }
   ];
   
