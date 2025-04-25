@@ -19,7 +19,7 @@ const Features = () => {
     {
       icon: 'fa-coins',
       title: 'Creator Rewards',
-      description: 'Authors receive direct rewards when their content is valued by the community.'
+      description: 'Bookmark creators receive direct rewards when their content is valued by the community.'
     },
     {
       icon: 'fa-search',
